@@ -1,0 +1,14 @@
+{
+  "name": "RustShopAPI",
+  "version": "1.0.0",
+  "main": "app.js",
+  "repository": "https://github.com/A-Abdeen/RustShopAPI.git",
+  "author": "A-Abdeen <ahmed.yahya18@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.17.1"
+  },
+  "scripts": {
+    "start": "nodemon app.js"
+  }
+}
