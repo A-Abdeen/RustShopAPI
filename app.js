@@ -1,5 +1,5 @@
 const express = require("express");
-let cars = require("./cars");
+// let cars = require("./cars");
 const bodyParser = require("body-parser");
 const slugify = require("slugify");
 const db = require("./db/models");
@@ -9,7 +9,7 @@ const { Car } = require("./db/models");
 app.use(bodyParser.json());
 
 // FULL YARD
-app.get("/cars", async (req, res) => {
+app.get("/", async (req, res) => {
   try {
     const cars = await Car.findAll({
       attributes: { exclude: ["createdAt", "updatedAt"] },
@@ -21,8 +21,9 @@ app.get("/cars", async (req, res) => {
 });
 
 // SINGLE CAR DETAIL BY ID
-app.get("/cars/:carId", (req, res) => {
-  const foundCar = cars.find((car) => car.id === +req.params.carId);
+app.get("/:carId", async (req, res) => {
+  const { carId } = req.params;
+  const foundCar = await Car.findByPk(carId);
   if (foundCar) {
     res.json(foundCar);
   } else {
@@ -31,9 +32,10 @@ app.get("/cars/:carId", (req, res) => {
   }
 }),
   // DELETE CAR BY ID
-  app.delete("/cars/:carId", async (req, res) => {
+  app.delete("/:carId", async (req, res) => {
     try {
-      const foundCar = await Car.findByPk(req.params.carId);
+      const { carId } = req.params;
+      const foundCar = await Car.findByPk(carId);
       if (foundCar) {
         await foundCar.destroy();
         res.status(204).end();
@@ -45,8 +47,24 @@ app.get("/cars/:carId", (req, res) => {
     }
   });
 
+// UPDATE CAR BY ID
+app.put("/:carId", async (req, res) => {
+  try {
+    const { carId } = req.params;
+    const foundCar = await Car.findByPk(carId);
+    if (foundCar) {
+      await foundCar.update(req.body);
+      res.status(200).json(foundCar);
+    } else {
+      res.status(404).json({ message: "Entry not found" });
+    }
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
 // ADD CAR
-app.post("/cars", async (req, res) => {
+app.post("/", async (req, res) => {
   try {
     const newCar = await Car.create(req.body);
     res.status(201).json(newCar);
