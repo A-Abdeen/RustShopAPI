@@ -1,14 +1,32 @@
 const express = require("express");
-
 const {
   fullYard,
   carDetail,
   carDelete,
   carUpdate,
   carAdd,
+  fetchCar,
 } = require("../controllers/carControllers");
 
 const router = express.Router();
+const upload = require("../middleware/multer.js");
+
+// single = single image upload
+// image = name of field in model where upload should happen (basically destination)
+
+// ROUTE PARAM FOR DETAIL/DELETE/UPDATE
+router.param("carId", async (req, res, next, carId) => {
+  const foundCar = await fetchCar(carId, next);
+  if (foundCar) {
+    req.car = foundCar;
+    next();
+  } else {
+    next({
+      status: 404,
+      message: "Entry not found",
+    });
+  }
+});
 
 // FULL YARD----------------------------------
 router.get("/", fullYard);
@@ -20,9 +38,9 @@ router.get("/:carId", carDetail);
 router.delete("/:carId", carDelete);
 
 // UPDATE CAR BY ID---------------------------
-router.put("/:carId", carUpdate);
+router.put("/:carId", upload.single("image"), carUpdate);
 
 // ADD CAR------------------------------------
-router.post("/", carAdd);
+router.post("/", upload.single("image"), carAdd);
 
 module.exports = router;
