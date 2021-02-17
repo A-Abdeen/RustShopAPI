@@ -1,4 +1,4 @@
-const { Car } = require("../db/models");
+const { Car, Manufacturer } = require("../db/models");
 
 // FETCH--------------------------------------
 exports.fetchCar = async (carId, next) => {
@@ -14,7 +14,12 @@ exports.fetchCar = async (carId, next) => {
 exports.fullYard = async (req, res, next) => {
   try {
     const cars = await Car.findAll({
-      attributes: { exclude: ["createdAt", "updatedAt"] },
+      attributes: { exclude: ["manufacturerId", "createdAt", "updatedAt"] },
+      include: {
+        model: Manufacturer,
+        as: "manufacturer",
+        attributes: ["name"],
+      },
     });
     res.json(cars);
   } catch (err) {
@@ -22,7 +27,7 @@ exports.fullYard = async (req, res, next) => {
   }
 };
 
-// SINGLE CAR DETAIL BY ID--------------------  WHY NOT SHOWING MESSAGE?
+// SINGLE CAR DETAIL BY ID--------------------  IS IT NORMAL TO SHOW MESSAGE IN CONSOLE?
 exports.carDetail = async (req, res, next) => {
   res.json(req.car);
 };
@@ -39,19 +44,10 @@ exports.carDelete = async (req, res, next) => {
 // UPDATE CAR BY ID---------------------------
 exports.carUpdate = async (req, res, next) => {
   try {
-    await req.car.update(req.body);
-    res.status(200).json(req.car);
-  } catch (err) {
-    next(err);
-  }
-};
-
-// ADD CAR------------------------------------
-exports.carAdd = async (req, res, next) => {
-  try {
-    req.body.image = `http://${req.get("host")}/media/${req.file.filename}`;
-    const newCar = await Car.create(req.body);
-    res.status(201).json(newCar);
+    if (req.file) {
+      await req.car.update(req.body);
+      res.status(200).json(req.car);
+    }
   } catch (err) {
     next(err);
   }

@@ -4,7 +4,6 @@ const {
   carDetail,
   carDelete,
   carUpdate,
-  carAdd,
   fetchCar,
 } = require("../controllers/carControllers");
 
@@ -39,8 +38,5 @@ router.delete("/:carId", carDelete);
 
 // UPDATE CAR BY ID---------------------------
 router.put("/:carId", upload.single("image"), carUpdate);
-
-// ADD CAR------------------------------------
-router.post("/", upload.single("image"), carAdd);
 
 module.exports = router;
