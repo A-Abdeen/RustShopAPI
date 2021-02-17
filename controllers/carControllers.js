@@ -18,7 +18,7 @@ exports.fullYard = async (req, res, next) => {
       include: {
         model: Manufacturer,
         as: "manufacturer",
-        attributes: ["name"],
+        attributes: ["id"],
       },
     });
     res.json(cars);

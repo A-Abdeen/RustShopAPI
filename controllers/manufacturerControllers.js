@@ -70,6 +70,7 @@ exports.manufacturerAdd = async (req, res, next) => {
 
 // ADD CAR------------------------------------
 exports.carAdd = async (req, res, next) => {
+  console.log(req.body.manufacturerId);
   try {
     if (req.file) {
       req.body.image = `http://${req.get("host")}/media/${req.file.filename}`;
