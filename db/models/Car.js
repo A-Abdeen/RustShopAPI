@@ -2,12 +2,12 @@ const SequelizeSlugify = require("sequelize-slugify");
 
 module.exports = (sequelize, DataTypes) => {
   const Car = sequelize.define("Car", {
-    year: {
-      type: DataTypes.INTEGER,
-    },
     name: {
       type: DataTypes.STRING,
       allowNull: false,
+    },
+    year: {
+      type: DataTypes.INTEGER,
     },
     price: {
       type: DataTypes.INTEGER,

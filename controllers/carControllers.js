@@ -14,11 +14,11 @@ exports.fetchCar = async (carId, next) => {
 exports.fullYard = async (req, res, next) => {
   try {
     const cars = await Car.findAll({
-      attributes: { exclude: ["manufacturerId", "createdAt", "updatedAt"] },
+      attributes: { exclude: ["createdAt", "updatedAt"] },
       include: {
         model: Manufacturer,
         as: "manufacturer",
-        attributes: ["id"],
+        attributes: { exclude: ["createdAt", "updatedAt"] },
       },
     });
     res.json(cars);
@@ -34,8 +34,14 @@ exports.carDetail = async (req, res, next) => {
 // DELETE CAR BY ID---------------------------
 exports.carDelete = async (req, res, next) => {
   try {
-    await req.car.destroy();
-    res.status(204).end();
+    if (req.user.id === req.bakery.userId) {
+      await req.car.destroy();
+      res.status(204).end();
+    } else {
+      const err = new Error("Unauthorized");
+      err.status = 401;
+      next(err);
+    }
   } catch (err) {
     next(err);
   }
@@ -44,9 +50,17 @@ exports.carDelete = async (req, res, next) => {
 // UPDATE CAR BY ID---------------------------
 exports.carUpdate = async (req, res, next) => {
   try {
-    if (req.file) {
-      await req.car.update(req.body);
-      res.status(200).json(req.car);
+    if (req.user.id === req.bakery.userId) {
+      if (req.file);
+      req.body.image = `http://${req.get("host")}/media/${req.file.filename}`;
+      {
+        await req.car.update(req.body);
+        res.status(200).json(req.car);
+      }
+    } else {
+      const err = new Error("Unauthorized");
+      err.status = 401;
+      next(err);
     }
   } catch (err) {
     next(err);

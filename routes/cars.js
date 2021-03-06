@@ -6,7 +6,7 @@ const {
   carUpdate,
   fetchCar,
 } = require("../controllers/carControllers");
-
+const passport = require("passport");
 const router = express.Router();
 const upload = require("../middleware/multer.js");
 
@@ -34,9 +34,18 @@ router.get("/", fullYard);
 router.get("/:carId", carDetail);
 
 // DELETE CAR BY ID---------------------------
-router.delete("/:carId", carDelete);
+router.delete(
+  "/:carId",
+  passport.authenticate("jwt", { session: false }),
+  carDelete
+);
 
 // UPDATE CAR BY ID---------------------------
-router.put("/:carId", upload.single("image"), carUpdate);
+router.put(
+  "/:carId",
+  upload.single("image"),
+  passport.authenticate("jwt", { session: false }),
+  carUpdate
+);
 
 module.exports = router;

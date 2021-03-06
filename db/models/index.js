@@ -42,13 +42,16 @@ Object.keys(db).forEach((modelName) => {
 
 // Relations
 db.Manufacturer.hasMany(db.Car, {
-  as: "car",
+  as: "cars",
   foreignKey: { fieldName: "manufacturerId", allowNull: false },
 });
 db.Car.belongsTo(db.Manufacturer, {
   as: "manufacturer",
   foreignKey: { fieldName: "manufacturerId" },
 });
+
+db.User.hasOne(db.Manufacturer, { as: "manufacturer", foreignKey: "userId" });
+db.Manufacturer.belongsTo(db.User, { as: "user" });
 
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;

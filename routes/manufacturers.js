@@ -8,7 +8,7 @@ const {
   fetchManufacturer,
   carAdd,
 } = require("../controllers/manufacturerControllers");
-
+const passport = require("passport");
 const router = express.Router();
 const upload = require("../middleware/multer.js");
 
@@ -29,6 +29,8 @@ router.param("manufacturerId", async (req, res, next, manufacturerId) => {
   }
 });
 
+// router.use(passport.authenticate("jwt", { session: false }));
+
 // FULL LIST----------------------------------
 router.get("/", fullList);
 
@@ -45,6 +47,11 @@ router.put("/:manufacturerId", upload.single("image"), manufacturerUpdate);
 router.post("/", upload.single("image"), manufacturerAdd);
 
 // ADD CAR------------------------------------
-router.post("/:manufacturerId/cars", upload.single("image"), carAdd);
+router.post(
+  "/:manufacturerId/cars",
+  passport.authenticate("jwt", { session: false }),
+  upload.single("image"),
+  carAdd
+);
 
 module.exports = router;

@@ -14,11 +14,11 @@ exports.fetchManufacturer = async (manufacturerId, next) => {
 exports.fullList = async (req, res, next) => {
   try {
     const manufacturers = await Manufacturer.findAll({
-      attributes: ["id", "name"],
+      attributes: { exclude: ["createdAt", "updatedAt"] },
       include: [
         {
           model: Car,
-          as: "car",
+          as: "cars",
           attributes: { exclude: ["createdAt", "updatedAt"] },
         },
       ],
@@ -46,7 +46,8 @@ exports.manufacturerDelete = async (req, res, next) => {
 // UPDATE MANUFACTURER BY ID---------------------------
 exports.manufacturerUpdate = async (req, res, next) => {
   try {
-    if (req.file) {
+    if (req.file);
+    {
       await req.manufacturer.update(req.body);
       res.status(200).json(req.manufacturer);
     }
@@ -58,6 +59,7 @@ exports.manufacturerUpdate = async (req, res, next) => {
 // ADD MANUFACTURER------------------------------------
 exports.manufacturerAdd = async (req, res, next) => {
   try {
+    req.body.userId = req.user.id;
     if (req.file) {
       req.body.image = `http://${req.get("host")}/media/${req.file.filename}`;
     }
@@ -70,14 +72,19 @@ exports.manufacturerAdd = async (req, res, next) => {
 
 // ADD CAR------------------------------------
 exports.carAdd = async (req, res, next) => {
-  console.log(req.body.manufacturerId);
   try {
-    if (req.file) {
-      req.body.image = `http://${req.get("host")}/media/${req.file.filename}`;
+    if (req.user.id === req.bakery.userId) {
+      if (req.file) {
+        req.body.image = `http://${req.get("host")}/media/${req.file.filename}`;
+        req.body.manufacturerId = req.manufacturer.id;
+      }
+      const newCar = await Car.create(req.body);
+      res.status(201).json(newCar);
+    } else {
+      const err = new Error("Unauthorized");
+      err.status = 401;
+      next(err);
     }
-    req.body.manufacturerId = req.manufacturer.id;
-    const newCar = await Car.create(req.body);
-    res.status(201).json(newCar);
   } catch (err) {
     next(err);
   }
