@@ -73,7 +73,7 @@ exports.manufacturerAdd = async (req, res, next) => {
 // ADD CAR------------------------------------
 exports.carAdd = async (req, res, next) => {
   try {
-    if (req.user.id === req.bakery.userId) {
+    if (req.user.id === req.manufacturer.userId) {
       if (req.file) {
         req.body.image = `http://${req.get("host")}/media/${req.file.filename}`;
         req.body.manufacturerId = req.manufacturer.id;

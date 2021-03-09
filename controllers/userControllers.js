@@ -15,12 +15,10 @@ exports.signup = async (req, res, next) => {
     req.body.password = hashedPassword;
     // Now a request can be securely registered in the User model via the create function
     const newUser = await User.create(req.body);
+    // To send a token to frontend upon signing up to automatically sign in (payload must match sign in payload)
     const payload = {
       id: newUser.id,
       username: newUser.username,
-      email: newUser.email,
-      firstName: newUser.firstName,
-      lastName: newUser.lastName,
       exp: Date.now() + JWT_EXPIRATION_MS, /// in milli-seconds
     };
     const token = jwt.sign(JSON.stringify(payload), JWT_SECRET);
@@ -39,6 +37,7 @@ exports.signup = async (req, res, next) => {
 exports.signin = async (req, res, next) => {
   const { user } = req;
   // decide what to include in payload object to send to frontend (anything)
+  // Good practice is to include useful attributes that frontend would consistently need to avoid sending sending multiple requests (e.g. user type; buyer or seller?)
   const payload = {
     id: user.id,
     username: user.username,
